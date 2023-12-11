@@ -191,3 +191,33 @@ bool ds3231_oscillator_is_stopped(ds3231_rtc_t *rtc) {
     i2c_read_blocking(rtc->i2c_port, rtc->i2c_addr, &buf, 1, false);
     return (buf >> 7) & 0b1;
 }
+
+void ds3231_get_temperature(float *val, ds3231_rtc_t *rtc) {
+    uint8_t buffer[2];
+    uint8_t reg = DS3231_TEMPERATURE_REG;
+    float frac;
+    
+    i2c_write_blocking(rtc->i2c_port, rtc->i2c_addr, &reg, 1, true);
+    i2c_read_blocking(rtc->i2c_port, rtc->i2c_addr, buffer, 2, false);
+
+    // This quote from the the data sheet (Rev. 10, p.15) explains the
+    // lines that follow:
+    //
+    // Temperature is represented as a 10-bit code with a resolution of
+    // 0.25°C and is accessible at location 11h and 12h. The temperature
+    // is encoded in two's complement format. The upper 8 bits, the
+    // integer portion, are at location 11h and the lower 2 bits, the
+    // fractional portion, are in the upper nibble at location 12h.
+    
+    frac = (float)(buffer[1] >> 6);
+    frac *= 0.25;
+    
+    if ((buffer[0] >> 7) & 1) {
+        // If bit 7 is set, the number is negative
+        *val = (float)((~buffer[0]) + 1);
+    } else {
+        // If bit 7 is not set, the number is positive.
+        *val = (float)buffer[0];
+    }
+    *val += frac;
+}

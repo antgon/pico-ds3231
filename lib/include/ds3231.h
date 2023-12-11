@@ -128,5 +128,15 @@ void ds3231_ctime(char *buf, uint8_t buf_size,
 */
 bool ds3231_oscillator_is_stopped(ds3231_rtc_t *rtc);
 
+/*! \brief Read the temperature
+ * 
+ * \param val Pointer to the temperature variable
+ * \param rtc Pointer to the ds3231_rtc_t structure
+ * 
+ * Note that the temperature registers are updated every 64 seconds. It
+ * thus makes little sense to read the temperature register more often
+ * than this.
+*/
+void ds3231_get_temperature(float *val, ds3231_rtc_t *rtc);
 
 #endif

@@ -51,6 +51,5 @@ These are additional functions that are available in the DS3231 but have
 not yet been implemented in this library:
 
 * Alarms/alarm interrupts
-* Reading temperature
 * Enabling/setting freq of square-wave output
  
